@@ -1,4 +1,4 @@
-package jetbook;
+package de.nalch.jetbook;
 
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
@@ -21,32 +21,51 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.text.MessageFormat;
 
-public class JetbookMain {
+/**
+ * Utility class to generate a pdf file containing pages readable by the rocketbook app but customized
+ * from some simple templates (for fancy logos and comprehensible icons).
+ */
+public final class JetbookMain {
 
-  private static final int pageCount = 98;
-  private static final String templateName = "nalch-logo";
-  private static final String resultName = "results" + File.separator + templateName + "-result";
+  /**
+   * How many pages the final product should have. Stick between 0-99 for the time being.
+   */
+  private static final int PAGECOUNT = 98;
+  /**
+   * Which template to use.
+   */
+  private static final String TEMPLATENAME = "nalch-logo";
+  /**
+   * Where to store the resulting pdf.
+   */
+  private static final String RESULTNAME = "results" + File.separator + TEMPLATENAME + "-result";
+
+  /**
+   * Nothing to do here, just preventing anyone to instantiate a utility class.
+   */
+  private JetbookMain() {
+  }
 
   /**
    * Generate a configurable rocketbook to print.
-   * 
+   *
    * @param args
    *          Arguments are not supported yet. Use the members of this class
    */
-  public static void main(String[] args) {
+  public static void main(final String[] args) {
     try {
       // read configuration
       Configurations configs = new Configurations();
       Configuration config = configs.properties(
           JetbookMain.class.getResource(
-              File.separator + "templates" + File.separator + templateName + ".properties"
+              File.separator + "templates" + File.separator + TEMPLATENAME + ".properties"
           )
       );
 
       File tempFile = File.createTempFile("jetbook", ".pdf");
       File tempFileStamped = File.createTempFile("jetbook_stamped", ".pdf");
       PdfReader templateReader = new PdfReader(
-          JetbookMain.class.getResourceAsStream("/templates/" + templateName + ".pdf")
+          JetbookMain.class.getResourceAsStream("/templates/" + TEMPLATENAME + ".pdf")
       );
       Document document = new Document();
 
@@ -54,7 +73,7 @@ public class JetbookMain {
         PdfSmartCopy tempResult = new PdfSmartCopy(document, new FileOutputStream(tempFile));
         document.open();
 
-        for (int pageNumber = 1; pageNumber <= pageCount; pageNumber++) {
+        for (int pageNumber = 1; pageNumber <= PAGECOUNT; pageNumber++) {
           PdfImportedPage pdfPage = tempResult.getImportedPage(templateReader, 1);
           tempResult.addPage(pdfPage);
         }
@@ -68,7 +87,7 @@ public class JetbookMain {
             resultReader,
             new FileOutputStream(tempFileStamped.getAbsolutePath())
         );
-        for (int currentPage = 1; currentPage <= pageCount; currentPage++) {
+        for (int currentPage = 1; currentPage <= PAGECOUNT; currentPage++) {
           PdfContentByte content = pdfStamper.getOverContent(currentPage);
 
           // prepare QR code
@@ -96,7 +115,7 @@ public class JetbookMain {
         pdfStamper.close();
         resultReader.close();
 
-        FileUtils.copyFile(tempFileStamped, new File(resultName + ".pdf"));
+        FileUtils.copyFile(tempFileStamped, new File(RESULTNAME + ".pdf"));
       } catch (DocumentException e) {
         e.printStackTrace();
       } finally {
@@ -109,9 +128,9 @@ public class JetbookMain {
     } catch (ConfigurationException e1) {
       e1.printStackTrace();
     }
-    
+
     System.out.println("finished");
-    
+
   }
 
 }
