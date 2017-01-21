@@ -4,9 +4,7 @@ Of course, you will not be able to erase your notes with water, but the erasing 
 So simply buy some Frixion ball pens, generate some pages and bind them (or let them bind online) into a notebook to your liking.
 
 # Images
-![Original Rocketbook](https://raw.githubusercontent.com/nalch/jetbook/master/images/original.jpg)
-![Image processing](https://raw.githubusercontent.com/nalch/jetbook/master/images/beforeafter_phones.jpg)
-![Individual template](https://raw.githubusercontent.com/nalch/jetbook/master/images/nalch-logo-result.png)
+![Original Rocketbook](https://raw.githubusercontent.com/nalch/jetbook/master/images/original.jpg) ![Image processing](https://raw.githubusercontent.com/nalch/jetbook/master/images/beforeafter_phones.jpg) ![Individual template](https://raw.githubusercontent.com/nalch/jetbook/master/images/nalch-logo-result.png)
 
 
 # Usage
