@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>de.nalch</groupId>
     <artifactId>jetbook</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.1</version>
     <name>jetbook</name>
     <description>creates a configurable rocketbook clone to print yourself and use with the rocketbook app</description>
 
@@ -106,4 +106,17 @@
             </plugin>
         </plugins>
     </reporting>
+    <url>https://github.com/nalch/jetbook</url>
+    <scm>
+        <url>https://github.com/nalch/jetbook</url>
+        <developerConnection>nalch</developerConnection>
+    </scm>
+    <issueManagement>
+        <url>https://github.com/nalch/jetbook/issues</url>
+        <system>Github</system>
+    </issueManagement>
+    <ciManagement>
+        <system>Travis</system>
+        <url>https://travis-ci.org/nalch/jetbook</url>
+    </ciManagement>
 </project>
