@@ -19,8 +19,8 @@ java -jar jetbook-0.1.jar -n 98 -i nalch-default -o /home/nalch/jetbook
 ```
 
 The arguments are:
-| argument      | cli arg       | documentation | default value |
-| ------------- | ------------- | ------------- | ------------- |
-| pagecount | -i | how many pages the resulting document should have | 1 |
-| inputtemplate | -i | choose an available template. Currently: nalch-default, nalch-logo | nalch-default |
-| outputfile | -o | choose the resulting file (without the ending, that is automatically set to pdf) | results/result |
+| argument      | cli arg       | documentation                                                                    | default value  |
+|---------------|---------------|----------------------------------------------------------------------------------|----------------|
+| pagecount     | -n            | how many pages the resulting document should have                                | 1              |
+| inputtemplate | -i            | choose an available template. Currently: nalch-default, nalch-logo               | nalch-default  |
+| outputfile    | -o            | choose the resulting file (without the ending, that is automatically set to pdf) | results/result |
