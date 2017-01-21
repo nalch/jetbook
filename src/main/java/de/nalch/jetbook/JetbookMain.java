@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.text.MessageFormat;
+import java.util.function.Consumer;
 
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
@@ -46,27 +47,49 @@ public final class JetbookMain {
    */
   public static void main(final String[] args) {
 
-    OptionParser parser = new OptionParser(); // nio:
-    OptionSpec<Integer> optionPagecount = parser.accepts("n").withOptionalArg().ofType(Integer.class).defaultsTo(1);
-    OptionSpec<String> optionTemplatename = parser.accepts("i").withOptionalArg().ofType(String.class)
+    // configure command line arguments
+    OptionParser parser = new OptionParser(); // niov:
+    OptionSpec<Integer> optionPagecount = parser
+        .accepts("n")
+        .withOptionalArg()
+        .ofType(Integer.class)
+        .defaultsTo(1);
+    OptionSpec<String> optionTemplatename = parser
+        .accepts("i")
+        .withOptionalArg()
+        .ofType(String.class)
         .defaultsTo("nalch-default");
-    OptionSpec<String> optionResultname = parser.accepts("o").withOptionalArg().ofType(String.class)
+    OptionSpec<String> optionResultname = parser
+        .accepts("o")
+        .withOptionalArg()
+        .ofType(String.class)
         .defaultsTo("results" + File.separator + "result");
+    parser.accepts("q");
     OptionSet options = parser.parse(args);
 
-    // How many pages the final product should have. Stick between 1-99 for the
-    // time being
+    // How many pages the final product should have
     final int pageCount = options.valueOf(optionPagecount).intValue();
     // Which template to use
     final String templateName = options.valueOf(optionTemplatename);
     // Where to store the resulting pdf
     final String resultName = options.valueOf(optionResultname);
+    final boolean quiet = options.has("q");
+
+    // create log functions, that only log, if the program is not quiet
+    //CHECKSTYLE.OFF: Inline Conditionals
+    // sufficiently simple to understand, so checkstyle does not have power here
+    Consumer<String> log = quiet ? (message) -> { } : System.out::print;
+    Consumer<String> logln = quiet ? (message) -> { } : System.out::println;
+    //CHECKSTYLE.ON: Inline Conditionals
+
+    logln.accept("Starting generation");
 
     try {
       // read configuration
       Configurations configs = new Configurations();
       Configuration config = configs.properties(
-          JetbookMain.class.getResource(File.separator + "templates" + File.separator + templateName + ".properties"));
+          JetbookMain.class.getResource(File.separator + "templates" + File.separator + templateName + ".properties")
+      );
 
       final int maxPages = config.getInt("maxPageCount", Integer.MAX_VALUE);
       if (pageCount > maxPages) {
@@ -76,22 +99,26 @@ public final class JetbookMain {
       File tempFile = File.createTempFile("jetbook", ".pdf");
       File tempFileStamped = File.createTempFile("jetbook_stamped", ".pdf");
       PdfReader templateReader = new PdfReader(
-          JetbookMain.class.getResourceAsStream("/templates/" + templateName + ".pdf"));
+          JetbookMain.class.getResourceAsStream("/templates/" + templateName + ".pdf")
+      );
       Document document = new Document();
 
       try {
+        log.accept("Populating temporary pdf with " + pageCount + " pages");
         PdfSmartCopy tempResult = new PdfSmartCopy(document, new FileOutputStream(tempFile));
         document.open();
 
         for (int pageNumber = 1; pageNumber <= pageCount; pageNumber++) {
           PdfImportedPage pdfPage = tempResult.getImportedPage(templateReader, 1);
           tempResult.addPage(pdfPage);
+          log.accept(".");
         }
 
         document.close();
         templateReader.close();
         tempResult.close();
 
+        log.accept("\nPopulating temporary pdf with qrcodes");
         PdfReader resultReader = new PdfReader(tempFile.getAbsolutePath());
         PdfStamper pdfStamper = new PdfStamper(resultReader, new FileOutputStream(tempFileStamped.getAbsolutePath()));
         for (int currentPage = 1; currentPage <= pageCount; currentPage++) {
@@ -101,20 +128,32 @@ public final class JetbookMain {
           int qrCodeSize = config.getInt("qrCodeSize");
           String pageString = String.format(config.getString("qrCodePageFormat"), currentPage);
           String qrCodeText = MessageFormat.format(config.getString("qrCodeTextTemplate"), pageString);
-          String qrapiString = "https://api.qrserver.com/v1/create-qr-code/" + "?size=" + qrCodeSize + "x" + qrCodeSize
-              + "&ecc=Q" + "&data=" + URLEncoder.encode(qrCodeText, "UTF-8");
+          String qrapiString = "https://api.qrserver.com/v1/create-qr-code/"
+              + "?size=" + qrCodeSize + "x" + qrCodeSize
+              + "&ecc=Q"
+              + "&data=" + URLEncoder.encode(qrCodeText, "UTF-8");
           Image qrCode = Image.getInstance(new URL(qrapiString));
 
-          content.addImage(qrCode, qrCodeSize, 0, 0, qrCodeSize, config.getFloat("qrCodeX"),
-              config.getFloat("qrCodeY"));
+          content.addImage(
+              qrCode,
+              qrCodeSize,
+              0,
+              0,
+              qrCodeSize,
+              config.getFloat("qrCodeX"),
+              config.getFloat("qrCodeY")
+          );
+          log.accept(".");
         }
         pdfStamper.close();
         resultReader.close();
 
+        logln.accept("\nMoving result to " + resultName + ".pdf");
         FileUtils.copyFile(tempFileStamped, new File(resultName + ".pdf"));
       } catch (DocumentException e) {
         e.printStackTrace();
       } finally {
+        logln.accept("Delete temporary files");
         FileUtils.deleteQuietly(tempFile);
         FileUtils.deleteQuietly(tempFileStamped);
       }
@@ -125,7 +164,7 @@ public final class JetbookMain {
       e1.printStackTrace();
     }
 
-    System.out.println("finished");
+    logln.accept("finished");
 
   }
 

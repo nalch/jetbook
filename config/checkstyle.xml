@@ -59,7 +59,15 @@
     <!-- <property name="fileExtensions" value="java"/> -->
     <!-- </module> -->
 
+    <module name="SuppressionCommentFilter">
+        <property name="offCommentFormat" value="CHECKSTYLE.OFF\: ([\w\|]+)" />
+        <property name="onCommentFormat" value="CHECKSTYLE.ON\: ([\w\|]+)" />
+        <property name="checkFormat" value="$1" />
+    </module>
+
     <module name="TreeWalker">
+        <!-- Included for SuprressionCommentFilter -->
+        <module name="FileContentsHolder"/>
 
         <!-- Checks for Javadoc comments. -->
         <!-- See http://checkstyle.sf.net/config_javadoc.html -->
