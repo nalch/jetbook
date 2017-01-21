@@ -19,6 +19,7 @@ java -jar jetbook-0.1.jar -n 98 -i nalch-default -o /home/nalch/jetbook
 ```
 
 The arguments are:
+
 | argument      | cli arg       | documentation                                                                    | default value  |
 |---------------|---------------|----------------------------------------------------------------------------------|----------------|
 | pagecount     | -n            | how many pages the resulting document should have                                | 1              |
